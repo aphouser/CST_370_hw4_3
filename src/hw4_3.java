@@ -1,5 +1,5 @@
 /*
- * HackerRank link:https://www.hackerrank.com/contests/cst370-su20-hw4/challenges/dfs-4/submissions/code/1323610108
+ * HackerRank link:https://www.hackerrank.com/contests/cst370-su20-hw4/challenges/dfs-4/submissions/code/1323645369
  * Title: hw4_3.java
  * Abstract: Depth First Search algorithm.  User inputs number of vertices and edges, then edge info.  Program
  *          runs Depth First Search and output of Mark array.
@@ -8,18 +8,16 @@
  * Date: 5/15/2020
  */
 
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class hw4_3 {
 
     public static void main(String[] args) {
 
         ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
-        Stack<Integer> stack = new Stack<Integer>();
         ArrayList<Boolean> visited = new ArrayList<>();
         ArrayList<Integer> output = new ArrayList<>();
+        Set<Integer> nodes = new TreeSet<Integer>();
 
         Scanner in = new Scanner(System.in);
 
@@ -38,8 +36,15 @@ public class hw4_3 {
         // add edge mapping for each
         for (int i = 0; i < e; i++) {
             int src = in.nextInt();
+            nodes.add(src);
             int dest = in.nextInt();
+            nodes.add(dest);
             list.get(src).add(dest);
+        }
+
+        // sort edge mapping info
+        for (int i = 0; i < v; i++) {
+            Collections.sort(list.get(i));
         }
 
         in.close();
@@ -49,8 +54,27 @@ public class hw4_3 {
             visited.add(false);
         }
 
+        output = dfs(0, list, visited, output);
+
+        // print output
+        Iterator<Integer> iterator = nodes.iterator();
+
+        while (iterator.hasNext()) {
+            int num = iterator.next();
+            System.out.print("Mark[" + num + "]:");
+
+            System.out.println(output.indexOf(num)+1);
+
+        }
+
+    }
+
+    public static ArrayList<Integer> dfs(int stackStart, ArrayList<ArrayList<Integer>> list, ArrayList<Boolean> visited, ArrayList<Integer> output) {
+
+        Stack<Integer> stack = new Stack<Integer>();
+
         // push the first element onto the stack
-        stack.push(0);
+        stack.push(stackStart);
 
         // while the stack is not empty, pop a node and add
         while (!stack.empty()) {
@@ -65,20 +89,18 @@ public class hw4_3 {
                 visited.set(topStack, true);
             }
 
-            // get next level nodes adding to stack in reverse order so that they output in the right order
-            for (int i = list.get(topStack).size()-1; i >= 0; i--) {
-                int nextLevel = list.get(topStack).get(i);
+            // iterate through each list and run dfs recursively
+            Iterator<Integer> looper = list.get(topStack).iterator();
 
-                // if the next level node has not been visited, add it
-                if(!visited.get(nextLevel)) {
-                    stack.push(nextLevel);
+            while (looper.hasNext())
+            {
+                int next = looper.next();
+                if(!visited.get(next)) {
+                    dfs(next, list, visited, output);
                 }
             }
         }
 
-        // print output
-        for (int i = 0; i < v; i++) {
-            System.out.println("Mark[" + i + "]:" + (output.indexOf(i)+1));
-        }
+        return output;
     }
 }
